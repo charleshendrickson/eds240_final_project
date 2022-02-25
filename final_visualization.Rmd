@@ -1,0 +1,80 @@
+---
+title: "fish_survey"
+author: "Charles Hendrickson"
+date: "2/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# load packages
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+```
+
+
+The data is from the Environmental Data Initiative data portal. https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-mcr.6.61
+
+The Anual Fish Survey data contains fish transect visual counts repeated annually include species, fish length, estimated biomass, and trophic group.
+```{r}
+# load data
+annual_fish_survey_data <- read.csv("data/MCR_LTER_Annual_Fish_Survey_20220119.csv")
+
+```
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
