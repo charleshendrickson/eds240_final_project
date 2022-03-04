@@ -12,9 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 # load packages
-library(ggplot2)
-library(lubridate)
-library(tidyverse)
+librarian::shelf(ggplot2,lubridate, tidyverse, janitor, plotly)
 ```
 
 
@@ -29,18 +27,72 @@ annual_fish_survey_data <- read.csv("data/MCR_LTER_Annual_Fish_Survey_20220119.c
 
 
 ```{r}
+# explore data
+str(annual_fish_survey_data)
+```
 
+Clean data column names and 
+```{r}
+# make all column names lowercase 
+annual_fish_survey_data <- annual_fish_survey_data %>%
+  clean_names()
+
+# Change data type of the column 'site' from numeric to a factor
+annual_fish_survey_data$site <- as.factor(annual_fish_survey_data$site)
+```
+
+Filter data 
+```{r}
+# Group by year, site, and biomass
+annual_biomass_data <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  group_by(year, site) %>%
+  summarise(mean_biomass = mean(biomass))
 ```
 
 
+Line chart 
+```{r}
+# Plot biomass by year and color the sites
+biomass_plot <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, color = site)) +
+  geom_point() + 
+  geom_line(aes(group = site)) +
+  labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
+       x = "Year",
+       y = "Average Biomass")
 
 
+# Make plot interactive 
+ggplotly(biomass_plot)
+```
 
 
+Stacked bar chart 
+```{r}
+# Plot biomass by year and color the sites
+biomass_plot <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, fill = site)) +
+  geom_bar(position="stack", stat="identity") +
+  labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
+       x = "Year",
+       y = "Average Biomass")
 
 
+# Make plot interactive 
+ggplotly(biomass_plot)
+```
+
+Change in mean_biomass over time 
+```{r}
+# Find the average biomass for a site per year 
 
 
+# Find the average biomass of the site across all years 
+
+
+# Subtract the two to normalize the observations 
+
+
+```
 
 
 
