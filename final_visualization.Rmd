@@ -70,7 +70,7 @@ ggplotly(biomass_plot)
 Stacked bar chart 
 ```{r}
 # Plot biomass by year and color the sites
-biomass_plot <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, fill = site)) +
+biomass_plot2 <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, fill = site)) +
   geom_bar(position="stack", stat="identity") +
   labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
        x = "Year",
@@ -78,15 +78,24 @@ biomass_plot <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomas
 
 
 # Make plot interactive 
-ggplotly(biomass_plot)
+ggplotly(biomass_plot2)
 ```
 
 Change in mean_biomass over time 
 ```{r}
 # Find the average biomass for a site per year 
-
+annual_biomass_data <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  group_by(year, site) %>%
+  summarise(mean_biomass = mean(biomass)) 
 
 # Find the average biomass of the site across all years 
+avg_biomass <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  group_by(site) %>%
+  summarise(mean_biomass = mean(biomass))
+
+# Combine the data frames 
 
 
 # Subtract the two to normalize the observations 
