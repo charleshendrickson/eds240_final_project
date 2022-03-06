@@ -23,6 +23,8 @@ The Anual Fish Survey data contains fish transect visual counts repeated annuall
 # load data
 annual_fish_survey_data <- read.csv("data/MCR_LTER_Annual_Fish_Survey_20220119.csv")
 
+percent_cover_data <- read.csv("data/knb-lter-mcr.4_2_20190321.csv")
+
 ```
 
 
@@ -31,30 +33,104 @@ annual_fish_survey_data <- read.csv("data/MCR_LTER_Annual_Fish_Survey_20220119.c
 str(annual_fish_survey_data)
 ```
 
-Clean data column names and 
+Clean data column names and change data type of the column 'site' from numeric to a factor
 ```{r}
 # make all column names lowercase 
 annual_fish_survey_data <- annual_fish_survey_data %>%
   clean_names()
 
+percent_cover_data <- percent_cover_data %>% 
+  clean_names()
+
 # Change data type of the column 'site' from numeric to a factor
 annual_fish_survey_data$site <- as.factor(annual_fish_survey_data$site)
+
 ```
 
-Filter data 
+Get substring of the 'location' column 
+https://www.datasciencemadesimple.com/substring-function-in-r/
+
+```{r}
+# We only want "LTER #" 
+# Below I used substr() function to find first n characters of the column in R. substr() function takes column name, starting position and length of the strings as argument, which will return the substring of the specific column as shown below.
+
+annual_fish_survey_data$substring_location = 
+  substr(annual_fish_survey_data$location,1,6)
+
+percent_cover_data$substring_location = 
+  substr(percent_cover_data$location,1,6)
+
+# We only want the year, not the month so create of substring of the year column. 
+percent_cover_data <- percent_cover_data %>%
+  separate(date, c("year", "month"), "-")
+
+```
+
+
+Select/Filter data 
 ```{r}
 # Group by year, site, and biomass
 annual_biomass_data <- annual_fish_survey_data %>%
   filter(coarse_trophic == "Primary Consumer") %>% 
-  group_by(year, site) %>%
+  group_by(year, substring_location) %>%
   summarise(mean_biomass = mean(biomass))
+
+
+# Select for only Macroalgae 
+macroalgae_percent_cover_data <- percent_cover_data %>% 
+  select(year, substring_location, macroalgae)
+
+```
+
+
+Find the average macroalgae percent cover at LTER 1 each year 
+```{r}
+# Find the average macroalgae percent cover at LTER 1 each year 
+macroalgae_LTER1 <- macroalgae_percent_cover_data %>% 
+  filter(substring_location == "LTER 1") %>% 
+  group_by(year,substring_location) %>% 
+  summarise(avg_pct_cover = mean(macroalgae))
+
+```
+
+Find the mean primary consumer fish biomass each year for LTER site 1
+```{r}
+# Find the mean biomass for site 1 each year 
+avg_biomass_LTER1 <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer", substring_location == "LTER 1") %>% 
+  group_by(year, substring_location) %>%
+  summarise(mean_biomass = mean(biomass))
+```
+
+
+```{r}
+ggplot(data = macroalgae_LTER1, aes(x = year, y = avg_pct_cover)) +
+  geom_point() + 
+  geom_line(aes(group = substring_location)) +
+  labs(title = "Average Macroalgae Percent Cover in Moorea, French Polynesia (2006-2021)",
+       x = "Year",
+       y = "Average Percent Cover (%)") +
+  theme_bw()
+```
+
+
+```{r}
+ggplot(data = avg_biomass_LTER1, aes(x = year, y = mean_biomass)) +
+  geom_point() +
+  geom_line(aes(group = substring_location)) +
+  labs(title = "Average Biomass of Primary Consumer Fish in Moorea, French Polynesia 
+(2006-2021)",
+       x = "Year",
+       y = "Average Biomass (grams)") +
+  theme_bw()
 ```
 
 
 Line chart 
 ```{r}
 # Plot biomass by year and color the sites
-biomass_plot <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, color = site)) +
+biomass_plot <- ggplot(data = annual_biomass_data, 
+                       aes(x = year, y = mean_biomass, color = site)) +
   geom_point() + 
   geom_line(aes(group = site)) +
   labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
@@ -81,36 +157,83 @@ biomass_plot2 <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_bioma
 ggplotly(biomass_plot2)
 ```
 
-Change in mean_biomass over time 
-```{r}
-# Find the average biomass for a site per year 
-annual_biomass_data <- annual_fish_survey_data %>%
-  filter(coarse_trophic == "Primary Consumer") %>% 
-  group_by(year, site) %>%
-  summarise(mean_biomass = mean(biomass)) 
 
-# Find the average biomass of the site across all years 
-avg_biomass <- annual_fish_survey_data %>%
+Anomaly of mean biomass  
+```{r}
+# Find the mean biomass of each site across all years 
+avg_biomass_per_site <- annual_fish_survey_data %>%
   filter(coarse_trophic == "Primary Consumer") %>% 
   group_by(site) %>%
   summarise(mean_biomass = mean(biomass))
 
-# Combine the data frames 
+# In the 'avg_biomass_s1' data frame, subtract the mean biomass of site 1 across all years 'avg_biomass_total$mean_biomass'by the mean biomass for site 1 each year (Normalize the site 1 data to make an anomaly)
 
+avg_biomass_LTER1 <- avg_biomass_LTER1 %>% 
+  mutate("biomass_anomaly" = mean_biomass - 194.0221,
+         "anomaly_sign" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
 
-# Subtract the two to normalize the observations 
+```
 
-
+Plot biomass anomaly from site 1 
+```{r}
+ggplot(data = avg_biomass_LTER1, aes(x = year, y = biomass_anomaly)) +
+  geom_bar(stat = "identity", position = "identity", aes(fill = anomaly_sign)) +
+  scale_fill_manual(name = "Anomaly",values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
+  labs(title = "Biomass Anomaly of Primary Consumer Fish in Moorea, French Polynesia 
+LTER Site 1 (2006-2021)",
+       x = "Year",
+       y = "Biomass Anomaly (grams)") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 ```
 
 
 
+```{r}
+# Find mean biomass of all years 
+mean_biomass_total <- annual_fish_survey_data %>% 
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  summarise(mean_biomass = mean(biomass))
+
+as.numeric(mean_biomass_total)
+```
+
+Find the mean primary consumer fish biomass each year 
+```{r}
+# Find the mean biomass each year 
+avg_biomass_per_year <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  group_by(year) %>%
+  summarise(mean_biomass = mean(biomass)) %>% 
+  mutate("biomass_anomaly" = mean_biomass - 186.1223,
+         "anomaly_sign" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
+```
 
 
+Plot biomass anomaly 2006-2021
+```{r}
+# Plot biomass anomaly 2006-2021
+anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_anomaly)) +
+  geom_bar(stat = "identity", position = "identity", aes(fill = anomaly_sign)) +
+  scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
+  labs(title = "Average biomass of herbivorous reef fish compared to the long-term 
+average from (2006-2021) in Moorea, French Polynesia",
+       x = "Year",
+       y = "Biomass Anomaly (grams)") +
+  theme_bw() +
+  theme(legend.title = element_blank()) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  theme(plot.title = element_text(vjust = 1)) # Change vertical position
 
+ggplotly(anomaly_plot) %>% 
+    add_annotations( text="Anomaly", xref="paper", yref="paper",
+                  x=1.05, xanchor="left",
+                  y=0.8, yanchor="bottom",    # Same y as legend below
+                  legendtitle=TRUE, showarrow=FALSE ) %>%
+  layout(legend=list(y=0.8, yanchor="top"))
+```
 
-
-
+Fig 1. The average biomass (grams) of herbivorous reef fish since 2006 as compared to the average biomass taken from 2006 to 2021. Anomaly in biomass refers to the comparison for a given place and time with the equivalent average biomass for that place and time, based on data from a particular span of time. So an anomaly of +20 grams would mean that the biomass was +20 grams higher that year than the average in the time span from 2006-2021. 
 
 
 
