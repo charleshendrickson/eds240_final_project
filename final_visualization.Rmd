@@ -45,6 +45,7 @@ percent_cover_data <- percent_cover_data %>%
 # Change data type of the column 'site' from numeric to a factor
 annual_fish_survey_data$site <- as.factor(annual_fish_survey_data$site)
 
+
 ```
 
 Get substring of the 'location' column 
@@ -130,9 +131,9 @@ Line chart
 ```{r}
 # Plot biomass by year and color the sites
 biomass_plot <- ggplot(data = annual_biomass_data, 
-                       aes(x = year, y = mean_biomass, color = site)) +
+                       aes(x = year, y = mean_biomass, color = substring_location)) +
   geom_point() + 
-  geom_line(aes(group = site)) +
+  geom_line(aes(group = substring_location)) +
   labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
        x = "Year",
        y = "Average Biomass")
@@ -146,7 +147,7 @@ ggplotly(biomass_plot)
 Stacked bar chart 
 ```{r}
 # Plot biomass by year and color the sites
-biomass_plot2 <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, fill = site)) +
+biomass_plot2 <- ggplot(data = annual_biomass_data, aes(x = year, y = mean_biomass, fill = substring_location)) +
   geom_bar(position="stack", stat="identity") +
   labs(title = "Fish Biomass in Moorea, French Polynesia (2006-2021)",
        x = "Year",
@@ -216,6 +217,8 @@ Plot biomass anomaly 2006-2021
 anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_anomaly)) +
   geom_bar(stat = "identity", position = "identity", aes(fill = anomaly_sign)) +
   scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
+  geom_vline(xintercept = 2, linetype = "dotdash") +
+  geom_text(aes(x = 2, label="\nHurricane", y=12), angle = 90) +
   labs(title = "Average biomass of herbivorous reef fish compared to the long-term 
 average from (2006-2021) in Moorea, French Polynesia",
        x = "Year",
@@ -231,6 +234,7 @@ ggplotly(anomaly_plot) %>%
                   y=0.8, yanchor="bottom",    # Same y as legend below
                   legendtitle=TRUE, showarrow=FALSE ) %>%
   layout(legend=list(y=0.8, yanchor="top"))
+
 ```
 
 Fig 1. The average biomass (grams) of herbivorous reef fish since 2006 as compared to the average biomass taken from 2006 to 2021. Anomaly in biomass refers to the comparison for a given place and time with the equivalent average biomass for that place and time, based on data from a particular span of time. So an anomaly of +20 grams would mean that the biomass was +20 grams higher that year than the average in the time span from 2006-2021. 
