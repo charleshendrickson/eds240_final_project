@@ -171,14 +171,14 @@ avg_biomass_per_site <- annual_fish_survey_data %>%
 
 avg_biomass_LTER1 <- avg_biomass_LTER1 %>% 
   mutate("biomass_anomaly" = mean_biomass - 194.0221,
-         "anomaly_sign" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
+         "Anomaly" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
 
 ```
 
 Plot biomass anomaly from site 1 
 ```{r}
 ggplot(data = avg_biomass_LTER1, aes(x = year, y = biomass_anomaly)) +
-  geom_bar(stat = "identity", position = "identity", aes(fill = anomaly_sign)) +
+  geom_bar(stat = "identity", position = "identity", aes(fill = Anomaly)) +
   scale_fill_manual(name = "Anomaly",values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
   labs(title = "Biomass Anomaly of Primary Consumer Fish in Moorea, French Polynesia 
 LTER Site 1 (2006-2021)",
@@ -207,7 +207,7 @@ avg_biomass_per_year <- annual_fish_survey_data %>%
   group_by(year) %>%
   summarise(mean_biomass = mean(biomass)) %>% 
   mutate("biomass_anomaly" = mean_biomass - 186.1223,
-         "anomaly_sign" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
+         "Anomaly" = ifelse(biomass_anomaly > 0, "Above Avg.", "Below Avg."))
 ```
 
 
@@ -215,20 +215,34 @@ Plot biomass anomaly 2006-2021
 ```{r}
 # Plot biomass anomaly 2006-2021
 anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_anomaly)) +
-  geom_bar(stat = "identity", position = "identity", aes(fill = anomaly_sign)) +
-  scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
-  geom_vline(xintercept = 2, linetype = "dotdash") +
-  geom_text(aes(x = 2, label="\nHurricane", y=12), angle = 90) +
-  labs(title = "Average biomass of herbivorous reef fish compared to the long-term 
-average from (2006-2021) in Moorea, French Polynesia",
+  geom_bar(stat = "identity", position = "identity", aes(fill = Anomaly)) +
+  scale_fill_brewer(palette = "Set2") +
+  #scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
+  geom_vline(xintercept = 5, linetype = "dotdash", alpha = .5) +
+  annotate("text", x = 6.05, y = 12, label = "Cyclone Oli", size = 3, alpha = .5) +
+  annotate("rect", xmin = 1, xmax = 4, ymin = -Inf, ymax = Inf,
+           alpha = .3,fill = "red") +
+  annotate("text", x = 2.5, y = 12, label = "Crown of Thorns
+Outbreak", size = 3, colour = "red", alpha = .5) +
+  labs(title = "Herbivorous Reef Fish Biomass Anomaly",
+  subtitle = "Moorea, French Polynesia (2006-2021)",
        x = "Year",
-       y = "Biomass Anomaly (grams)") +
+       y = "Fish Biomass Anomaly (gm^2)") +
   theme_bw() +
   theme(legend.title = element_blank()) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
   theme(plot.title = element_text(vjust = 1)) # Change vertical position
 
-ggplotly(anomaly_plot) %>% 
+anomaly_plot
+
+
+# Plotly
+ggplotly(anomaly_plot) %>%
+  layout(title = list(text = paste0('Herbivorous Reef Fish Biomass Anomaly',
+                                    '<br>',
+                                    '<sup>',
+                                    'Moorea, French Polynesia (2006-2021)',
+                                    '</sup>'))) %>% 
     add_annotations( text="Anomaly", xref="paper", yref="paper",
                   x=1.05, xanchor="left",
                   y=0.8, yanchor="bottom",    # Same y as legend below
@@ -237,10 +251,32 @@ ggplotly(anomaly_plot) %>%
 
 ```
 
+
+Final non-interactive plot 
+```{r}
+# Plot biomass anomaly 2006-2021
+anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_anomaly)) +
+  geom_bar(stat = "identity", position = "identity", aes(fill = Anomaly)) +
+  scale_fill_brewer(palette = "Set2") +
+  #scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
+  geom_vline(xintercept = 5, linetype = "dotdash", alpha = .5) +
+  annotate("text", x = 6.05, y = 12, label = "Cyclone Oli", size = 3, alpha = .5) +
+  annotate("rect", xmin = 1, xmax = 4, ymin = -Inf, ymax = Inf,
+           alpha = .3,fill = "red") +
+  annotate("text", x = 2.5, y = 12, label = "Crown of Thorns
+Outbreak", size = 3, colour = "red", alpha = .5) +
+  labs(title = "Herbivorous Reef Fish Biomass Anomaly",
+  subtitle = "Moorea, French Polynesia (2006-2021)",
+       x = "Year",
+       y = "Fish Biomass Anomaly (gm^2)") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  theme(plot.title = element_text(vjust = 1)) # Change vertical position
+
+anomaly_plot
+```
+
 Fig 1. The average biomass (grams) of herbivorous reef fish since 2006 as compared to the average biomass taken from 2006 to 2021. Anomaly in biomass refers to the comparison for a given place and time with the equivalent average biomass for that place and time, based on data from a particular span of time. So an anomaly of +20 grams would mean that the biomass was +20 grams higher that year than the average in the time span from 2006-2021. 
-
-
-
 
 
 
