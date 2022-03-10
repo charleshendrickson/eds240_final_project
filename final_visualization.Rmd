@@ -3,9 +3,11 @@ title: "fish_survey"
 author: "Charles Hendrickson"
 date: "2/24/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -265,16 +267,22 @@ anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_an
            alpha = .3,fill = "red") +
   annotate("text", x = 2.5, y = 12, label = "Crown of Thorns
 Outbreak", size = 3, colour = "red", alpha = .5) +
-  labs(title = "Herbivorous Reef Fish Biomass Anomaly",
+  labs(title = "Herbivorous Reef Fish - Annual Biomass Anomalies",
   subtitle = "Moorea, French Polynesia (2006-2021)",
+  caption = "Figure 3: Annual biomass anomalies for herbivorous reef fish in Moorea",
        x = "Year",
        y = "Fish Biomass Anomaly (gm^2)") +
   theme_bw() +
+  theme(plot.caption.position = "panel", plot.caption = element_text(hjust = 0)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
   theme(plot.title = element_text(vjust = 1)) # Change vertical position
 
 anomaly_plot
 ```
+
+
+
+
 
 Fig 1. The average biomass (grams) of herbivorous reef fish since 2006 as compared to the average biomass taken from 2006 to 2021. Anomaly in biomass refers to the comparison for a given place and time with the equivalent average biomass for that place and time, based on data from a particular span of time. So an anomaly of +20 grams would mean that the biomass was +20 grams higher that year than the average in the time span from 2006-2021. 
 
