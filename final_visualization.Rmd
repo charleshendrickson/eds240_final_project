@@ -269,7 +269,9 @@ anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_an
 Outbreak", size = 3, colour = "red", alpha = .5) +
   labs(title = "Herbivorous Reef Fish - Annual Biomass Anomalies",
   subtitle = "Moorea, French Polynesia (2006-2021)",
-  caption = "Figure 3: Annual biomass anomalies for herbivorous reef fish in Moorea",
+  caption = "Figure 3: Annual mean herbivorous reef fish biomass compared to the long term average
+from 2006–2021 (orange and green bars), based on data from the MCR LTER, plus the
+Crown of Thorns Sea Star outbreak (shaded red) and Cyclone Oli (dot-dash line)",
        x = "Year",
        y = "Fish Biomass Anomaly (gm^2)") +
   theme_bw() +
