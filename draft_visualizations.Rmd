@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 # load packages
-librarian::shelf(ggplot2,lubridate, tidyverse, janitor, plotly)
+librarian::shelf(ggplot2,lubridate, tidyverse, janitor, plotly, fishualize)
 ```
 
 
@@ -307,9 +307,7 @@ mean_biomass_species <- annual_fish_survey_data %>%
 
 ```{r}
 # Plot biomass for site 
-mean_fish_biomass_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, 
-                                                                  y = mean_biomass, 
-                                                                  fill = "coral")) +
+ggplot(data = avg_biomass_per_year, aes(x = year, y = mean_biomass, fill = "darkseagreen")) +
   geom_bar(stat = "identity", position = "identity") +
   guides(fill="none") +
   geom_vline(xintercept = 5, alpha = .8) +
@@ -320,7 +318,7 @@ mean_fish_biomass_plot <- ggplot(data = avg_biomass_per_year, aes(x = year,
 Outbreak", size = 3, colour = "black", alpha = .8) +
   labs(title = "Herbivorous Reef Fish - Annual Mean Biomass",
   subtitle = "Moorea, French Polynesia (2006-2021)",
-  caption = "Figure 3: Annual mean biomass of herbivorous reef fish from 2006–2021 (coral-pink bars), based on 
+  caption = "Figure 3: Annual mean biomass of herbivorous reef fish in Moorea from 2006–2021 (coral-pink bars), based on 
 data from the MCR LTER, plus the Crown of Thorns Sea Star outbreak (shaded purple) and Cyclone Oli (solid line)",
        x = "Year",
        y = "Mean Fish Biomass (gm^2)") +
@@ -328,10 +326,26 @@ data from the MCR LTER, plus the Crown of Thorns Sea Star outbreak (shaded purpl
   theme(plot.caption.position = "panel", plot.caption = element_text(hjust = 0)) +
   theme(plot.title = element_text(vjust = 1)) # Change vertical position
 
-mean_fish_biomass_plot
+# mean_fish_biomass_plot
 ```
 
 
+```{r}
+# load data for plotting 
+# 1. Create list of species names currently featured in fishualize
+spp <- fishualize::fish_palettes()
+
+ggplot(diamonds) +
+  geom_bar(aes(cut, fill = cut)) +
+  scale_fill_fish_d(option = "Acanthurus_triostegus") +
+  add_fishape(family = "Acanthuridae",
+              option = "Acanthurus_triostegus",
+              xmin = 1, xmax = 3, ymin = 15000, ymax = 20000,
+              fill = fish(option = "Acanthurus_triostegus", n = 5)[3],
+              alpha = 0.8) +
+  theme_bw()
+
+```
 
 
 
