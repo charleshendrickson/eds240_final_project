@@ -261,8 +261,8 @@ anomaly_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, y = biomass_an
   geom_bar(stat = "identity", position = "identity", aes(fill = Anomaly)) +
   scale_fill_brewer(palette = "Set2") +
   #scale_fill_manual(values=c("Above Avg." = "steelblue", "Below Avg." = "firebrick1")) +
-  geom_vline(xintercept = 5, linetype = "dotdash", alpha = .5) +
-  annotate("text", x = 6.05, y = 12, label = "Cyclone Oli", size = 3, alpha = .5) +
+  geom_vline(xintercept = 5, linetype = "longdash", alpha = .8) +
+  annotate("text", x = 6.05, y = 12, label = "Cyclone Oli", size = 3, alpha = .8) +
   annotate("rect", xmin = 1, xmax = 4, ymin = -Inf, ymax = Inf,
            alpha = .3,fill = "red") +
   annotate("text", x = 2.5, y = 12, label = "Crown of Thorns
@@ -271,7 +271,7 @@ Outbreak", size = 3, colour = "red", alpha = .5) +
   subtitle = "Moorea, French Polynesia (2006-2021)",
   caption = "Figure 3: Annual mean herbivorous reef fish biomass compared to the long term average
 from 2006–2021 (orange and green bars), based on data from the MCR LTER, plus the
-Crown of Thorns Sea Star outbreak (shaded red) and Cyclone Oli (dot-dash line)",
+Crown of Thorns Sea Star outbreak (shaded red) and Cyclone Oli (dashed line)",
        x = "Year",
        y = "Fish Biomass Anomaly (gm^2)") +
   theme_bw() +
@@ -282,15 +282,54 @@ Crown of Thorns Sea Star outbreak (shaded red) and Cyclone Oli (dot-dash line)",
 anomaly_plot
 ```
 
-
-
-
-
 Fig 1. The average biomass (grams) of herbivorous reef fish since 2006 as compared to the average biomass taken from 2006 to 2021. Anomaly in biomass refers to the comparison for a given place and time with the equivalent average biomass for that place and time, based on data from a particular span of time. So an anomaly of +20 grams would mean that the biomass was +20 grams higher that year than the average in the time span from 2006-2021. 
 
 
 
 
+
+
+
+
+
+
+
+
+
+```{r}
+# Find the mean biomass each year 
+mean_biomass_species <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>% 
+  group_by(year, taxonomy) %>%
+  summarise(mean_biomass = mean(biomass))
+```
+
+
+```{r}
+# Plot biomass for site 
+mean_fish_biomass_plot <- ggplot(data = avg_biomass_per_year, aes(x = year, 
+                                                                  y = mean_biomass, 
+                                                                  fill = "coral")) +
+  geom_bar(stat = "identity", position = "identity") +
+  guides(fill="none") +
+  geom_vline(xintercept = 5, alpha = .8) +
+  annotate("text", x = 6.05, y = 200, label = "Cyclone Oli", size = 3, alpha = .8) +
+  annotate("rect", xmin = 1, xmax = 4, ymin = -Inf, ymax = Inf,
+           alpha = .3, fill = "purple") +
+  annotate("text", x = 2.5, y = 200, label = "Crown of Thorns
+Outbreak", size = 3, colour = "black", alpha = .8) +
+  labs(title = "Herbivorous Reef Fish - Annual Mean Biomass",
+  subtitle = "Moorea, French Polynesia (2006-2021)",
+  caption = "Figure 3: Annual mean biomass of herbivorous reef fish from 2006–2021 (coral-pink bars), based on 
+data from the MCR LTER, plus the Crown of Thorns Sea Star outbreak (shaded purple) and Cyclone Oli (solid line)",
+       x = "Year",
+       y = "Mean Fish Biomass (gm^2)") +
+  theme_bw() +
+  theme(plot.caption.position = "panel", plot.caption = element_text(hjust = 0)) +
+  theme(plot.title = element_text(vjust = 1)) # Change vertical position
+
+mean_fish_biomass_plot
+```
 
 
 
