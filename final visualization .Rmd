@@ -93,19 +93,13 @@ ggplot(data = mean_biomass_per_year, aes(x = year, y = mean_biomass, fill = "cor
 Outbreak", size = 3, colour = "black", alpha = .8) +
   labs(title = "Herbivorous Reef Fish - Annual Mean Biomass",
   subtitle = "Moorea, French Polynesia (2006-2021)",
-  caption = "Figure 3: Annual mean biomass of herbivorous reef fish in Moorea from 2006–2021 (coral-pink bars), based on data from 
-the MCR LTER, plus the Crown of Thorns (COTs) Sea Star outbreak (shaded purple) and Cyclone Oli (solid line). 
-Herbivorous reef fish feed on macroalgae, which compete with corals for light and oxygen. By keeping macroalgae levels
-low, these fish play an important role in maintaining the health of coral reef ecosystems. However, herbivorous reef fish in 
-Moorea have been negatively impacted by disturbances, such as COTs outbreaks and damaging storms. COTs are a
-natural predator of corals, however outbreaks of COTs can decimate large areas of live corals. Additionally, a near miss by 
-tropical cyclone Oli in early 2010 significantly reduced the cover of live coral in Moorea.",
        x = "Year",
        y = "Mean Fish Biomass (gm^2)") +
   theme_bw() +
   theme(plot.caption.position = "panel", plot.caption = element_text(hjust = 0)) +
-  theme(plot.title = element_text(vjust = 1)) # Change vertical position
+  theme(plot.title = element_text(vjust = 1)) + # Change vertical position
+  theme(plot.title=element_text(size=20))
 
-# mean_fish_biomass_plot
+
 ```
 
