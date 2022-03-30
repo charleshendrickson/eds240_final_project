@@ -41,13 +41,20 @@ percent_cover_data <- percent_cover_data %>%
 annual_fish_survey_data$site <- as.factor(annual_fish_survey_data$site)
 ```
 
-
+Tidy the fish survey dataset
 ```{r}
+
 # We only want "LTER #" 
 # Below I used substr() function to find first n characters of the column in R. substr() function takes column name, starting position and length of the strings as argument, which will return the substring of the specific column as shown below.
 
 annual_fish_survey_data$substring_location = 
   substr(annual_fish_survey_data$location,1,6)
+
+# Create 'year', 'site', and 'biomass' column
+MCR_LTER_annual_fish_survey_data <- annual_fish_survey_data %>%
+  filter(coarse_trophic == "Primary Consumer") %>%
+  select(year, 'site' = substring_location, biomass)
+
 
 percent_cover_data$substring_location = 
   substr(percent_cover_data$location,1,6)
